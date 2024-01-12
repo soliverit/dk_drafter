@@ -9,6 +9,12 @@ from PIL import Image, ImageDraw
 # Contains tile and play associations. 
 ##
 class Map():
+	MAP_IMAGE_PATH		= "C:/workspaces/dungeon_keeper/dungeon_drafter/images/map/gmap-32.png"
+	MAP_WIDTH			= 320
+	MAP_HEIGHT			= 200
+	MAP_BASE_POINT_X	= 77
+	MAP_BASE_POINT_Y	= 30
+	MAP_BOX_SIZE		= 166
 	def __init__(self, width, height):
 		self.width			= width		# Dungeon width
 		self.height			= height	# Dungeon height
@@ -17,6 +23,7 @@ class Map():
 		self.path			= False		# If parsed from a .xlsx, this is the path
 		self.spreadsheet	= False		# Pandas table from the first spreadsheet in the path workbook
 		self.drawSize		= 50		# No. pixels per tile on drawImage outputs
+		self.rawImage		= False		# Draw image without map background
 		self.prepareTiles()				# Create the 2D map with all dirt tiles
 	##
 	# Add a Player
@@ -28,11 +35,16 @@ class Map():
 	##
 	def drawImage(self, path=False):
 		# Canvas dimensions
-		canvasWidth 	= self.width * self.drawSize
-		canvasHeight	= self.height * self.drawSize
+		canvasWidth 	= self.width * self.drawSize if self.rawImage else self.__class__.MAP_WIDTH
+		canvasHeight	= self.height * self.drawSize if self.rawImage else self.__class__.MAP_HEIGHT
 		# Make the canvas
-		im = Image.new('RGB', (canvasWidth, canvasHeight), Tile.LABELED_PROPERTIES[Tile.DIRT]["colour"])
+		if self.rawImage:
+			im = Image.new('RGB', (canvasWidth, canvasHeight), Tile.LABELED_PROPERTIES[Tile.DIRT]["colour"])
+		else:
+			im	= Image.open(self.__class__.MAP_IMAGE_PATH)
 		draw = ImageDraw.Draw(im)
+		if not self.rawImage:
+			draw.rectangle((self.__class__.MAP_BASE_POINT_X, self.__class__.MAP_BASE_POINT_Y, self.__class__.MAP_BASE_POINT_X + self.__class__.MAP_BOX_SIZE, self.__class__.MAP_BASE_POINT_Y + self.__class__.MAP_BOX_SIZE), fill=(0,0,0))
 		# Every row of tiles
 		for rowID in range(len(self.tiles)):
 			row = self.tiles[rowID]
@@ -43,10 +55,17 @@ class Map():
 				if tile.alias == Tile.DIRT:
 					continue
 				# Tile canvas dimensions
-				startX	= cellID * self.drawSize + 1
-				startY	= rowID * self.drawSize + 1
-				endX	= cellID * self.drawSize + self.drawSize + 1
-				endY	= rowID * self.drawSize + self.drawSize + 1
+				if self.rawImage:
+					startX	= cellID * self.drawSize + 1
+					startY	= rowID * self.drawSize + 1 
+					endX	= cellID * self.drawSize + self.drawSize + 1 
+					endY	= rowID * self.drawSize + self.drawSize + 1 
+				else:
+					blockSize	= self.__class__.MAP_BOX_SIZE / self.width 
+					startX	= cellID * blockSize + self.__class__.MAP_BASE_POINT_X + 1
+					startY 	= rowID * blockSize + self.__class__.MAP_BASE_POINT_Y + 1
+					endX	= cellID * blockSize + blockSize + self.__class__.MAP_BASE_POINT_X + 1
+					endY 	= rowID * blockSize + blockSize + self.__class__.MAP_BASE_POINT_Y + 1
 				# Pillow it
 				draw.rectangle((startX, startY, endX, endY), fill=tile.colour)
 		# Show it
