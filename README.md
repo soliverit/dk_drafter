@@ -17,7 +17,7 @@ Example:
 
 <img src="https://imgur.com/jAnV5hf.png" width="300">
 
-## Getting started (developed with Python 3.1. Any 3 should be fine).
+## Getting started (developed with Python 3.11.2. Any 3 should be fine).
 - Install pandas (DataFrame library that parses the spreadsheet)
 - Install pillow (Image drawing library)
 
