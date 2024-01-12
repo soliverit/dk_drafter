@@ -48,6 +48,8 @@ map.drawToConsole()
 ##
 # Draw an image using Pillow
 ##
-# Number of pixel per Tile
+# Produce a raw image (False) or have the in-game back background (True)
+map.rawImage	= True
+# Number of pixel per Tile IF map.rawImage == True
 map.drawSize	= 50
 map.drawImage()	# Include path="./some_path.jpg" to write to file
