@@ -2,7 +2,7 @@ from lib.map		import Map
 from lib.player		import Player
 from lib.dungeon	import Dungeon
 
-# Create a blank Map with 64*64 tiles
+# Create a blank Map with 32*32 tiles
 map	= Map(32, 32)
 ##
 # Parse spreadsheet
